@@ -18,6 +18,7 @@ typedef struct particle_s {
   
 } particle_t;
 
+#ifdef VERBOSE
 //
 void printFinal(particle_t p) {
     FILE *fp;
@@ -29,6 +30,7 @@ void printFinal(particle_t p) {
 
     fclose(fp);
 }
+#endif
 
 //
 particle_t alloc(particle_t p) { 
@@ -192,8 +194,10 @@ int main(int argc, char **argv)
 	 "Average performance:", "", rate, drate);
   printf("-----------------------------------------------------\n");
   
+  #ifdef VERBOSE
   //
-  //printFinal(p);
+  printFinal(p);
+  #endif
 
   //
   freeParticle(p);
