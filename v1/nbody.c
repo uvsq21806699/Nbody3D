@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 //
 typedef float              f32;
@@ -87,6 +88,7 @@ void move_particles(particle_t p, const f32 dt)
   //
   for (u64 i = 0; i < p.n; i++)
     {
+      clock_t st = clock();
       //
       f32 fx = 0.0;
       f32 fy = 0.0;
@@ -94,25 +96,34 @@ void move_particles(particle_t p, const f32 dt)
 
       //23 floating-point operations
       for (u64 j = 0; j < p.n; j++)
-	{
-	  //Newton's law
-	  const f32 dx = p.x[j] - p.x[i]; //1
-	  const f32 dy = p.y[j] - p.y[i]; //2
-	  const f32 dz = p.z[j] - p.z[i]; //3
-	  const f32 d_2 = (dx * dx) + (dy * dy) + (dz * dz) + softening; //9
-	  const f32 d_3_over_2 = pow(d_2, 3.0 / 2.0); //11
+      {
+        //Newton's law
+        const f32 dx = p.x[j] - p.x[i]; //1
+        const f32 dy = p.y[j] - p.y[i]; //2
+        const f32 dz = p.z[j] - p.z[i]; //3
+        const f32 d_2 = (dx * dx) + (dy * dy) + (dz * dz) + softening; //9
+        const f32 d_3_over_2 = pow(d_2, 3.0 / 2.0); //11
 
-	  //Net force
-	  fx += dx / d_3_over_2; //13
-	  fy += dy / d_3_over_2; //15
-	  fz += dz / d_3_over_2; //17
-	}
+        //Net force
+        fx += dx / d_3_over_2; //13
+        fy += dy / d_3_over_2; //15
+        fz += dz / d_3_over_2; //17
+      }
+
 
       //
       p.vx[i] += dt * fx; //19
       p.vy[i] += dt * fy; //21
       p.vz[i] += dt * fz; //23
+
+      clock_t en = clock();
+
+      f32 time_passed = (float)(en - st) / CLOCKS_PER_SEC;
+
+      //if (!(i%100)) printf("Time ellapsed for loop %lld : %f\n", i, time_passed);
     }
+
+
 
   //3 floating-point operations
   for (u64 i = 0; i < p.n; i++)
@@ -155,7 +166,9 @@ int main(int argc, char **argv)
   
   //
   printf("\033[1m%5s %10s %10s %8s\033[0m\n", "Step", "Time, s", "Interact/s", "GFLOP/s"); fflush(stdout);
-  
+
+  //
+  f32 avrg = 0;
   //
   for (u64 i = 0; i < steps; i++)
     {
@@ -166,17 +179,20 @@ int main(int argc, char **argv)
 
       const f64 end = omp_get_wtime();
 
+      avrg += end-start;
+
       //Number of interactions/iterations
       const f32 h1 = (f32)(n) * (f32)(n - 1);
+
 
       //GFLOPS
       const f32 h2 = (23.0 * h1 + 3.0 * (f32)n) * 1e-9;
       
       if (i >= warmup)
-	{
-	  rate += h2 / (end - start);
-	  drate += (h2 * h2) / ((end - start) * (end - start));
-	}
+      {
+        rate += h2 / (end - start);
+        drate += (h2 * h2) / ((end - start) * (end - start));
+      }
 
       //
       printf("%5llu %10.3e %10.3e %8.1f %s\n",
@@ -188,7 +204,7 @@ int main(int argc, char **argv)
       
       fflush(stdout);
     }
-
+  
   //
   rate /= (f64)(steps - warmup);
   drate = sqrt(drate / (f64)(steps - warmup) - (rate * rate));
@@ -196,6 +212,8 @@ int main(int argc, char **argv)
   printf("-----------------------------------------------------\n");
   printf("\033[1m%s %4s \033[42m%10.1lf +- %.1lf GFLOP/s\033[0m\n",
 	 "Average performance:", "", rate, drate);
+  printf("-----------------------------------------------------\n");
+  printf("Temps moyen d'éxécutions d'une étapes: %f s\n",avrg/(f32)steps);
   printf("-----------------------------------------------------\n");
   
 #ifdef VERBOSE

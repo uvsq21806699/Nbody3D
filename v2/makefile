@@ -2,7 +2,10 @@
 
 all: nbody.g nbody.i
 
-nbody.g: nbody.c
+nbody_fast.g: nbody.c
+	gcc -march=native -mavx2 -Ofast -fopt-info-all=nbody.gcc.optrpt $< -o $@ -lm -fopenmp 
+
+nbody_0.g: nbody.c
 	gcc -march=native -mavx2 -Ofast -fopt-info-all=nbody.gcc.optrpt $< -o $@ -lm -fopenmp 
 
 nbodyv.g: nbody.c
@@ -19,4 +22,4 @@ local: nbody.c
 	gcc -march=native -Ofast -fopt-info-all=nbody.gcc.optrpt $< -o nbodyv.g -lm -fopenmp -DVERBOSE
 
 clean:
-	rm -Rf *~ nbody.g nbody.i nbodyv.g nbodyv.i *.optrpt Final_pos1.txt
+	rm -Rf *~ nbody.g nbody_fast.g nbody_0.g nbody.i nbodyv.g nbodyv.i *.optrpt Final_pos2.txt

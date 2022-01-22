@@ -1,8 +1,11 @@
 # -mavx2 don't work on my computer'
 
-all: nbody.g nbody.i
+all: nbody_fast.g nbody.i
 
-nbody.g: nbody.c
+nbody_fast.g: nbody.c
+	gcc -march=native -mavx2 -Ofast -fopt-info-all=nbody.gcc.optrpt $< -o $@ -lm -fopenmp 
+
+nbody_0.g: nbody.c
 	gcc -march=native -mavx2 -Ofast -fopt-info-all=nbody.gcc.optrpt $< -o $@ -lm -fopenmp 
 
 nbodyv.g: nbody.c
