@@ -17,6 +17,7 @@ typedef struct particle_s {
   
 } particle_t;
 
+#ifdef VERBOSE
 //
 void printFinal(particle_t *p, u64 n) {
     FILE *fp;
@@ -28,6 +29,9 @@ void printFinal(particle_t *p, u64 n) {
 
     fclose(fp);
 }
+#endif
+
+
 
 //
 void init(particle_t *p, u64 n)
@@ -113,6 +117,10 @@ int main(int argc, char **argv)
   //
   particle_t *p = malloc(sizeof(particle_t) * n);
 
+#ifdef VERBOSE
+  srand(69);
+#endif
+
   //
   init(p, n);
 
@@ -165,8 +173,10 @@ int main(int argc, char **argv)
 	 "Average performance:", "", rate, drate);
   printf("-----------------------------------------------------\n");
   
+#ifdef VERBOSE
   //
   printFinal(p,n);
+#endif
 
   //
   free(p);

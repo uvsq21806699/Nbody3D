@@ -22,7 +22,7 @@ typedef struct particle_s {
 //
 void printFinal(particle_t p) {
     FILE *fp;
-    fp  =fopen("Final_pos1.txt", "w");
+    fp  =fopen("Final_pos2.txt", "w");
 
     for (u64 i = 0;i < p.n;i++) {
         fprintf(fp,"%lld:{%f %f %f}\n",i,p.x[i],p.y[i],p.z[i]);
@@ -92,26 +92,26 @@ void move_particles(particle_t p, const f32 dt)
       f32 fy = 0.0;
       f32 fz = 0.0;
 
-      //23 floating-point operations
+      //22 floating-point operations
       for (u64 j = 0; j < p.n; j++)
-	{
-	  //Newton's law
-	  const f32 dx = p.x[j] - p.x[i]; //1
-	  const f32 dy = p.y[j] - p.y[i]; //2
-	  const f32 dz = p.z[j] - p.z[i]; //3
-	  const f32 d_2 = (dx * dx) + (dy * dy) + (dz * dz) + softening; //9
-	  const f32 d_3_over_2 = pow(d_2, 3.0 / 2.0); //11
+        {
+          //Newton's law
+          const f32 dx = p.x[j] - p.x[i]; //1
+          const f32 dy = p.y[j] - p.y[i]; //2
+          const f32 dz = p.z[j] - p.z[i]; //3
+          const f32 d_2 = (dx * dx) + (dy * dy) + (dz * dz) + softening; //9
+          const f32 d_3_over_2 = pow(d_2, 1.5); //10
 
-	  //Net force
-	  fx += dx / d_3_over_2; //13
-	  fy += dy / d_3_over_2; //15
-	  fz += dz / d_3_over_2; //17
-	}
+          //Net force
+          fx += dx / d_3_over_2; //12
+          fy += dy / d_3_over_2; //14
+          fz += dz / d_3_over_2; //16
+        }
 
       //
-      p.vx[i] += dt * fx; //19
-      p.vy[i] += dt * fy; //21
-      p.vz[i] += dt * fz; //23
+      p.vx[i] += dt * fx; //18
+      p.vy[i] += dt * fy; //20
+      p.vz[i] += dt * fz; //22
     }
 
   //3 floating-point operations
@@ -144,7 +144,7 @@ int main(int argc, char **argv)
 
 #ifdef VERBOSE
   srand(69);
-#endif  
+#endif
 
   //
   init(p);
@@ -170,7 +170,7 @@ int main(int argc, char **argv)
       const f32 h1 = (f32)(n) * (f32)(n - 1);
 
       //GFLOPS
-      const f32 h2 = (23.0 * h1 + 3.0 * (f32)n) * 1e-9;
+      const f32 h2 = (22.0 * h1 + 3.0 * (f32)n) * 1e-9;
       
       if (i >= warmup)
 	{

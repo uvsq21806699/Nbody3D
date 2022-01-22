@@ -1,0 +1,1 @@
+Changement de 3.0 / 2.0 par 0.5 dans le pow() de move()
