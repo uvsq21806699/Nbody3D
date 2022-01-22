@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 {
   //
   const u64 n = (argc > 1) ? atoll(argv[1]) : 16384;
-  const u64 steps= 10;
+  const u64 steps= 50;
   const f32 dt = 0.01;
 
   //
@@ -169,6 +169,7 @@ int main(int argc, char **argv)
 
   //
   f32 avrg = 0;
+
   //
   for (u64 i = 0; i < steps; i++)
     {
